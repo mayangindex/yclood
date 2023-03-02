@@ -1,0 +1,62 @@
+---
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_TAG}
+    volumes:
+      - ./config:/prometheus
+      - ./data/prometheus:/data
+    command:
+      - '--config.file=/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/data'
+    ports:
+      - 9090:9090
+    depends_on:
+      - alertmanager
+    restart: always
+    networks:
+      - prometheus
+  alertmanager:
+    image: prom/alertmanager:${ALERTMANAGER_TAG}
+    volumes:
+      - ./config:/prometheus
+      - ./data/alertmanager:/data
+    command:
+      - '--config.file=/prometheus/alertmanager.yml'
+      - '--storage.path=/data'
+    ports:
+      - 9093:9093
+    restart: always
+    networks:
+      - prometheus
+
+  node-exporter:
+    image: prom/node-exporter:${NODE_EXPORTER_TAG}
+    ports:
+      - 9100:9100
+    restart: always
+    networks:
+     - prometheus
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_TAG}
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    networks:
+     - prometheus
+volumes:
+  prometheus-data:
+  grafana_data:
+networks:
+  prometheus:
+    external: true
+

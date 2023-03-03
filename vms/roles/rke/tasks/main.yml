@@ -1,0 +1,75 @@
+---
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+#    upgrade: yes
+    update_cache: yes
+
+- name: Create directory for app
+  file:
+    path: "{{rke_dir}}"
+    state: directory
+    mode: 0755
+
+- name: Download rke2-images-calico.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-calico.linux-amd64.tar.zst
+    dest: "{{rke_dir}}"
+
+- name: Download sha256sum-amd64.txt
+  ansible.builtin.get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/sha256sum-amd64.txt
+    dest: "{{rke_dir}}"
+
+- name: Download rke2.linux-amd64.tar.gz
+  ansible.builtin.get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2.linux-amd64.tar.gz
+    dest: "{{rke_dir}}"
+
+- name: Download rke2-images-core.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-core.linux-amd64.tar.zst
+    dest: "{{rke_dir}}"
+
+- name: Download rke2-images-core.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: https://get.rke2.io
+    dest: /tmp/install.sh
+
+
+- name: Run install.sh
+  ansible.builtin.shell: INSTALL_RKE2_ARTIFACT_PATH=/var/lib/rancher/rke2/agent/images/ INSTALL_RKE2_METHOD=tar  sh /tmp/install.sh
+  args:
+    executable: /bin/sh
+
+- name: Enable rke2
+  ansible.builtin.shell: systemctl enable rke2-server.service
+  args:
+    executable: /bin/sh
+
+- name: Enable kubectl
+  ansible.builtin.shell: echo 'PATH=$PATH:/usr/local/bin' >> /etc/profile && echo 'PATH=$PATH:/var/lib/rancher/rke2/bin' >> /etc/profile && source /etc/profile
+  args:
+    executable: /bin/bash
+
+
+# - name: Run rke2
+#   ansible.builtin.shell: systemctl start rke2-server.service
+#   args:
+#     executable: /bin/sh
+
+
+
+
+
+# - name: Copy cleanup file
+#   template:
+#     src: templates/cleanup.sh
+#     dest: "{{prometheus_dir}}/cleanup.sh"
+#     mode: 0755
+
+# - name: This command will change the working directory to somedir/
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: ./cleanup.sh
+#     chdir: "{{prometheus_dir}}"

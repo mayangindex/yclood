@@ -1,0 +1,2 @@
+rke_dir: /var/lib/rancher/rke2/agent/images/
+rke_version: v1.23.14+rke2r1

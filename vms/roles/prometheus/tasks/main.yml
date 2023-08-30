@@ -2,8 +2,8 @@
 - name: Update and upgrade apt packages
   become: true
   apt:
-#    upgrade: yes
-    update_cache: yes
+    upgrade: true
+    update_cache: true
 
 - name: Install packages
   become: true
@@ -72,7 +72,7 @@
 #     mode: 0755
 
 # - name: Copy docker compose file
-#   template: 
+#   template:
 #     src: templates/docker-compose.yml.j2
 #     dest: "{{ prometheus_dir }}/docker-compose.yml"
 #     group: www-data
@@ -93,12 +93,10 @@
 #     dest: /etc/systemd/system/prometheus.service
 #     owner: root
 #     mode: 0644
-  
 # - name: Enable service
 #   systemd:
 #     name: prometheus
 #     enabled: yes
-  
 # - name: pull an image
 #   become: true
 #   docker_image:

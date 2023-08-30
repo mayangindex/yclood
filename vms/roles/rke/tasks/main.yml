@@ -44,9 +44,9 @@
     state: directory
     mode: 0755
 
-- name: Download rke2-images-calico.linux-amd64.tar.zst
+- name: Download rke2-images-{{cni}}.linux-amd64.tar.zst
   ansible.builtin.get_url:
-    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-calico.linux-amd64.tar.zst
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-{{cni}}.linux-amd64.tar.zst
     dest: "{{rke_dir}}"
 
 - name: Download sha256sum-amd64.txt
@@ -56,12 +56,14 @@
 
 - name: Download rke2.linux-amd64.tar.gz
   ansible.builtin.get_url:
-    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2.linux-amd64.tar.gz
+    url: "https://github.com/rancher/rke2/releases/download/\
+         {{rke_version}}/rke2.linux-amd64.tar.gz"
     dest: "{{rke_dir}}"
 
 - name: Download rke2-images-core.linux-amd64.tar.zst
   ansible.builtin.get_url:
-    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-core.linux-amd64.tar.zst
+    url: "https://github.com/rancher/rke2/releases/download/\
+         {{rke_version}}/rke2-images-core.linux-amd64.tar.zst"
     dest: "{{rke_dir}}"
 
 - name: Download rke2-images-core.linux-amd64.tar.zst

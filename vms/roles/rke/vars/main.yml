@@ -5,3 +5,4 @@ rancher_url: https://localhost
 rancher_admin_password: my_admin_password
 # rancher_version: rancher-stable
 # rancher_repo_url: https://releases.rancher.com/server-charts/stable
+cni: calico

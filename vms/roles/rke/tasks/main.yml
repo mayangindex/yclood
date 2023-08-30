@@ -26,11 +26,11 @@
         cmd: echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
     - name: 4. Update Packages
       apt:
-        update_cache: yes
+        update_cache: true
 
     - name: 5. Install helm
       apt:
-        update_cache: yes
+        update_cache: true
         name: helm
 
 - name: Install a list of packages
@@ -114,4 +114,4 @@
 - name: Enable service on Ubuntu 16 and Ubuntu 18/20
   systemd:
     name: startup
-    enabled: yes
+    enabled: true

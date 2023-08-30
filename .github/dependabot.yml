@@ -1,12 +1,12 @@
 ---
 version: 2
 updates:
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/vms/role/prometheus" # Location of package manifests
+  - package-ecosystem: "docker"
+    directory: "/vms/role/prometheus"
     schedule:
       interval: "daily"
 
-  - package-ecosystem: "github-actions" # See documentation for possible values
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"

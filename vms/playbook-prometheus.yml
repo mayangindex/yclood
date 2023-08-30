@@ -1,5 +1,5 @@
 ---
-- name: "Provision Image"
+- name: "Provision Image Prometheus"
   hosts: default
   become: true
   roles:

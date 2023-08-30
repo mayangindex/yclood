@@ -1,5 +1,7 @@
 {
-    "fileMatch": [
-      "(^|/)tasks/[^/]+\\.ya?ml$"
+    "extends": ["config:base"],
+    "checks": [
+      "ansible-lint",
+      "ansible-syntax"
     ]
   }

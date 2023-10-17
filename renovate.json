@@ -1,0 +1,11 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "platform": "github",
+  "baseBranch": "main",
+  "packageRules": [
+    {
+      "schedule": ["on monday"]
+    }
+  ]
+}

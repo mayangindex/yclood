@@ -1,11 +1,15 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
-  "platform": "github",
-  "baseBranch": "main",
-  "packageRules": [
-    {
-      "schedule": ["on monday"]
-    }
-  ]
-}
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:base"],
+    "platform": "github",
+    "baseBranch": "main",
+    "packageRules": [
+      {
+        "packageNames": ["*"],
+        "automerge": false,
+        "schedule": ["on monday"]
+      }
+    ],
+    "depTypes": ["*"],
+    "separateMajorMinor": true
+  }

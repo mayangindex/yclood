@@ -12,4 +12,7 @@
     ],
     "depTypes": ["*"],
     "separateMajorMinor": true
+      "extends": [
+    "config:recommended"
+  ]
   }

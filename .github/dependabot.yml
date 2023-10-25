@@ -2,7 +2,7 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/vms/*"
+    directory: "vms/roles/prometheus/templates/*"
     schedule:
       interval: "daily"
 

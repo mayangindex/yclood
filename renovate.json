@@ -6,15 +6,11 @@
     "baseBranch": "main",
     "packageRules": [
       {
-        "packageNames": ["*"],
-        "automerge": false,
-        "schedule": ["on monday"]
-      }
-,
 
-    {
-      "packageNames": ["ansible"],
-      "fileMatch": ["**/*.j2", "**/*.yml"]
+      "packageNames": ["ansible", "*"],
+      "fileMatch": ["**/*.j2", "**/*.yml"],
+                "automerge": false,
+        "schedule": ["on monday"]
     }
 
 

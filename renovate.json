@@ -2,7 +2,7 @@
   "extends": ["config:base"],
   "packageRules": [
     {
-      "packageNames": ["*"],
+      "packageNames": ["ansible", "ansible-role", "docker"],
       "fileMatch": ["**/*.j2", "**/*.yml"]
     }
   ]

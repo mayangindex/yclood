@@ -2,7 +2,7 @@
 version: '3'
 services:
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_TAG}
+    image: prom/prometheus:v2.36.2
     volumes:
       - ./config:/prometheus
       - ./data/prometheus:/data

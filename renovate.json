@@ -1,8 +1,9 @@
 {
-  "extends": ["config:base"],
   "packageRules": [
     {
-      "packageNames": ["*"]
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["*"],
+      "versioning": "semver"
     }
   ]
 }

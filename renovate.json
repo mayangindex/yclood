@@ -3,7 +3,7 @@
   "packageRules": [
     {
       "packageNames": ["ansible", "ansible-role", "docker"],
-      "fileMatch": ["**/*.j2", "**/*.yml"]
+      "fileMatch": ["**/*.j2"]
     }
   ]
 }

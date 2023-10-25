@@ -41,11 +41,7 @@
       "(^|/)kubernetes/.+\\.ya?ml(\\.j2)?(\\.j2)?$"
     ]
   },
-  "ansible": {
-    "fileMatch": [
-      "**/*.j2", "**/*.yml"
-    ]
-  },
+
     
   "kustomize": {
     "fileMatch": [

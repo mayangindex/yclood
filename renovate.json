@@ -1,6 +1,7 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["config:recommended"],
+    "fileMatch": ["**/*.yml", "**/*.j2"]
     "platform": "github",
     "baseBranch": "main",
     "packageRules": [
@@ -11,5 +12,7 @@
       }
     ],
     "depTypes": ["*"],
-    "separateMajorMinor": true
+    "separateMajorMinor": true,
+
+    
   }

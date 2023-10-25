@@ -4,18 +4,13 @@
 
     "platform": "github",
     "baseBranch": "main",
-    "packageRules": [
-      {
 
-      "packageNames": ["ansible", "*"],
-      "fileMatch": ["**/*.j2", "**/*.yml"],
-                "automerge": false,
-        "schedule": ["on monday"]
+  "packageRules": [
+    {
+      "packageNames": ["ansible", "ansible-role", "docker"],
+      "fileMatch": ["**/*.j2", "**/*.yml"]
     }
-
-
-        
-    ],
+  ],
     "depTypes": ["*"],
     "separateMajorMinor": true,
 

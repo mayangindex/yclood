@@ -1,18 +1,5 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:recommended"],
-
-    "platform": "github",
-    "baseBranch": "main",
-
-  "packageRules": [
-    {
-      "packageNames": ["ansible", "ansible-role", "docker"],
-      "fileMatch": ["**/*.j2", "**/*.yml"]
-    }
-  ],
-    "depTypes": ["*"],
-    "separateMajorMinor": true,
-
-    
-  }
+  "extends": [
+    "config:base"
+  ]
+}

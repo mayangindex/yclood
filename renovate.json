@@ -6,18 +6,13 @@
 
   "regexManagers": [
     {
-      "description": "Update docker references in gitlab variables",
-      "fileMatch": ["\\vms\\.yml$"],
-      "matchStrings": [
-        "rke_version[A-Z_]*\\s*:\\s*(?<depName>[^:]+?):(?<currentValue>[a-z0-9.-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
+        "fileMatch": ["(^|/)tasks/[^/]+\\.ya?ml$"],
+        "datasourceTemplate": "docker"
     }
   ],
 
   "gitlabci": {
-    "fileMatch": ["\\vms\\.yml$"],
+    "fileMatch": ["(^|/)tasks/[^/]+\\.ya?ml$"],
     "pinDigests": true
   }
 }

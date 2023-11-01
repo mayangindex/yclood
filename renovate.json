@@ -26,8 +26,8 @@
     {
       "customType": "regex",
       "description": "Update docker image references",
-      "fileMatch": ["^charts\\/renovate\\/Chart\\.yaml$"],
-      "matchStrings": ["image: (?<depName>.*?):(?<currentValue>.*?)\\s+"],
+      "fileMatch": ["^vms\\/roles\\/prometheus\\/vars\\/main\\.yml$"],
+      "matchStrings": ["PROMETHEUS_TAG: (?<depName>.*?):(?<currentValue>.*?)\\s+"],
       "datasourceTemplate": "docker"
     },
     {

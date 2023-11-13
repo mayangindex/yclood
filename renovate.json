@@ -4,9 +4,7 @@
   ],
   "dependencyDashboard": true,
   "schedule": [
-    "before 7pm every weekday",
-    "after 7am every weekday",
-    "every weekend"
+    "before 7pm every weekday"
   ],
 
   "docker-compose": {

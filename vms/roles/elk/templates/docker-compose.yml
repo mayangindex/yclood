@@ -22,7 +22,7 @@ networks:
 
 services:
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     user: "0"
@@ -80,7 +80,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:

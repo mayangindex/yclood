@@ -6,6 +6,9 @@
   "docker": {
     "enabled": true
   },
+    "fileMatch": [
+    "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"
+  ],
   "ignorePaths": ["**/*.md", "**/*.json", "**/*.yml"],
   "prHourlyLimit": 5
 }

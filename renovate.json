@@ -5,10 +5,7 @@
   "regexManagers": [
     {
       "description": "Update docker references in gitlab variables",
-      "fileMatch": ["docker-compose.yml.j2"],
-            "depNameTemplate": "docker:$1",
-       "datasourceTemplate": "docker",
-       "versioningTemplate": "docker"
+      "fileMatch": ["docker-compose.yml.j2"]
     }
   ]
 }

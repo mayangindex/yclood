@@ -3,12 +3,6 @@
   "platform": "github",
   "labels": ["docker", "docker-compose"],
   "autodiscover": true,
-  "packageRules": [
-    {
-      "updateTypes": ["docker"],
-      "updateScope": "docker-compose.yml.j2"
-    }
-  ],
   "docker": {
     "enabled": true,
     "fileRules": [

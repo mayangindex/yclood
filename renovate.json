@@ -3,8 +3,7 @@
   "packageRules": [
     {
       "packageNames": ["*"],
-      "docker": true,
-      "dockerCompose": true
+      "dockerfile": true
     }
   ]
 }

@@ -3,25 +3,14 @@
     "config:base"
   ],
   "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dashboard",
-  "timezone": "America/Chicago",
-  "commitMessageSuffix": "[ci-skip]",
-  "commitBody": "Signed-off-by: Pyun Ramura <pyunramura@users.noreply.github.com>",
-  "rebaseWhen": "conflicted",
-  "assignees": ["@pyunramura"],
-  "labels": ["ready for review"],
   "schedule": [
     "before 7pm every weekday",
     "after 7am every weekday",
     "every weekend"
   ],
 
-  "vulnerabilityAlerts": {
-    "labels": ["security"],
-    "schedule": "at any time"
-  },
   "docker-compose": {
-    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.ya?ml$"]
+    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml$"]
   },
   "ignoreUnstable": true,
   "stabilityDays": 4

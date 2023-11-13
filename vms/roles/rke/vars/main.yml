@@ -1,8 +1,8 @@
 ---
-rke_dir: /var/lib/rancher/rke2/agent/images/
-rke_version: v1.23.14+rke2r1
+rke_dir: /var/lib/rancher/rke2/
+rke_version: v1.25.15+rke2r1
 rancher_url: https://localhost
 rancher_admin_password: my_admin_password
 # rancher_version: rancher-stable
 # rancher_repo_url: https://releases.rancher.com/server-charts/stable
-cni: calico
+rke2_cni: calico

@@ -1,0 +1,9 @@
+[Unit]
+Description = prometheus start service.
+After       = syslog.target
+
+[Service]
+ExecStart   = {{ prometheus_dir }}/startup.sh
+
+[Install]
+WantedBy=default.target

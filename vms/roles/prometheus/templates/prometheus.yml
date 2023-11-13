@@ -9,17 +9,17 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - 'prometheus:9090'
+          - "prometheus:9090"
     scheme: http
   - job_name: node-exporter
     metrics_path: /metrics
     static_configs:
       - targets:
-          - 'node-exporter:9100'
+          - "node-exporter:9100"
     scheme: http
   - job_name: grafana
     metrics_path: /metrics
     static_configs:
       - targets:
-          - 'grafana:3000'
+          - "grafana:3000"
     scheme: http

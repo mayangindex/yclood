@@ -1,22 +1,18 @@
 {
-  "variables": {
-    "token": ""
-  },
-
   "builders": [
     {
-      "type":                    "yandex",
-      "token":                   "{{user `token`}}",
-      "folder_id":               "b1gm8b1skobtbs2g01u7",
-      "zone":                    "ru-central1-a",
-      "image_name":              "rke-ubuntu-2004-lts-{{isotime | clean_resource_name}}",
-      "image_family":            "ubuntu-2004-lts",
-      "image_description":       "rke",
-      "source_image_family":     "ubuntu-2004-lts",
-      "use_ipv4_nat":            "true",
-      "disk_size_gb":            "20",
-      "disk_type":               "network-ssd",
-      "ssh_username":            "root"
+      "type": "yandex",
+      "token": "{{user `token`}}",
+      "folder_id": "b1gm8b1skobtbs2g01u7",
+      "zone": "ru-central1-a",
+      "image_name": "rke-v1-25-15-rke2r1-{{isotime | clean_resource_name}}",
+      "image_family": "ubuntu-2004-lts",
+      "image_description": "rke",
+      "source_image_family": "ubuntu-2204-lts",
+      "use_ipv4_nat": "true",
+      "disk_size_gb": "20",
+      "disk_type": "network-ssd",
+      "ssh_username": "root"
     }
   ],
   "provisioners": [

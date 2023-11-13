@@ -6,11 +6,11 @@
 
   "regexManagers": [
     {
-        "fileMatch": ["(^|/)tasks/[^/]+\\.ya?ml$"],
-        "matchStrings": [
-          "rke_version[A-Z_]*\\s*:\\s*(?<depName>[^:]+?):(?<currentValue>[a-z0-9.-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
-        ],
-        "datasourceTemplate": "docker"
+      "fileMatch": ["(^|/)tasks/[^/]+\\.ya?ml$"],
+      "matchStrings": [
+        "rke_version[A-Z_]*\\s*:\\s*(?<depName>[^:]+?):(?<currentValue>[a-z0-9.-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
 

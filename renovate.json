@@ -1,15 +1,15 @@
 {
-  "extends": [
-    "config:base"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "platform": "github",
+  "baseBranch": "main",
+  "packageRules": [
+    {
+      "packageNames": ["*"],
+      "automerge": false,
+      "schedule": ["on monday"]
+    }
   ],
-  "dependencyDashboard": true,
-  "schedule": [
-    "before 7pm every weekday"
-  ],
-
-  "docker-compose": {
-    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml$"]
-  },
-  "ignoreUnstable": true,
-  "stabilityDays": 4
+  "depTypes": ["*"],
+  "separateMajorMinor": true
 }

@@ -1,4 +1,8 @@
 {
+   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+   "extends": ["config:recommended"],
+
+   "prHourlyLimit": 4,
   "fileMatch": [
     "(^|/)(?:docker-)?compose[^/]*\\.y?ml.j2$"
   ]

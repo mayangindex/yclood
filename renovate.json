@@ -12,7 +12,7 @@
   ],
   "fileMatch": [
     "(^|/)(?:docker-)?compose[^/]*\\.y?ml.j2$"
-  ]
+  ],
   "depTypes": ["*"],
   "separateMajorMinor": true
 }

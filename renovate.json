@@ -1,14 +1,18 @@
 {
-  "extends": ["config:base"],
-  "platform": "github",
-  "labels": ["docker", "docker-compose"],
-  "autodiscover": true,
-  "docker": {
-    "enabled": true
-  },
-    "fileMatch": [
-    "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"
-  ],
-  "ignorePaths": ["**/*.md", "**/*.json", "**/*.yml"],
-  "prHourlyLimit": 5
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+
+  "prHourlyLimit": 4,
+
+  "regexManagers": [
+    {
+      "description": "Update docker references in gitlab variables",
+      "fileMatch": ["\\docker-compose.yml.j2"],
+      "matchStrings": [
+        "image:(?<currentValue>[a-z0-9.-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    }
+  ]
 }

@@ -1,14 +1,10 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "prHourlyLimit": 4,
-  "regexManagers": [
+  "extends": ["config:base"],
+  "packageRules": [
     {
-      "description": "Update docker references in gitlab variables",
-      "fileMatch": ["docker-compose.yml.j2"],
-            "depNameTemplate": "docker:$1",
-       "datasourceTemplate": "docker",
-       "versioningTemplate": "docker"
+      "packageNames": ["*"],
+      "docker": true,
+      "dockerCompose": true
     }
   ]
 }

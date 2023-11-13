@@ -1,5 +1,15 @@
 {
-  "extends": [
-    "config:base"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+
+  "prHourlyLimit": 4,
+
+  "regexManagers": [
+    {
+      "description": "Update docker references in gitlab variables",
+      "fileMatch": ["(^|/)(?:docker-)?compose[^/]*\\.y?ml$"],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    }
   ]
 }

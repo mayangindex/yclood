@@ -6,9 +6,6 @@
     {
       "description": "Update docker references in gitlab variables",
       "fileMatch": ["docker-compose.yml.j2"],
-      "matchStrings": [
-        "image:(?<currentValue>[a-z0-9.-]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
-      ],
       "depNameTemplate": "docker:$1",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"

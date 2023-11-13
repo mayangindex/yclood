@@ -8,21 +8,21 @@ RESET="\033[0m"
 PROJECT_NAME=prometheus
 hostname $PROJECT_NAME
 echo "127.0.0.1 $PROJECT_NAME" >>/etc/hosts
-ip=`curl http://checkip.amazonaws.com 2>/dev/null`
+ip=$(curl http://checkip.amazonaws.com 2>/dev/null)
 domain=$ip.nip.io
 cd {{ prometheus_dir }}
-echo "" >> /etc/motd
-echo "your $PROJECT_NAME is deploying, please wait a while..." >> /etc/motd
+echo "" >>/etc/motd
+echo "your $PROJECT_NAME is deploying, please wait a while..." >>/etc/motd
 # mkdir data
 # mkdir -m 777 data/prometheus
 # mkdir -m 777 data/alertmanager
 docker-compose up -d
 echo 'waiting for deploy'
 sed -i '/deploying, please wait a while/d' /etc/motd
-echo "" >> /etc/motd
-echo -e "$G Prometheus   $RESET is available under $B http://$domain:9090 $RESET" >> /etc/motd
-echo -e "$G AlertManager $RESET is available under $B http://$domain:9093 $RESET" >> /etc/motd
-echo -e "$G Grafana      $RESET is available under $B http://$domain:3000 $RESET" >> /etc/motd
-echo -e "Grafana default user:password $X admin:admin $RESET" >> /etc/motd
-echo -e "Config files are in $X {{prometheus_dir}}/config/ $RESET" >> /etc/motd
-echo -e "To restart services after config update make $G cd {{prometheus_dir}} $RESET and $G sudo docker-compose restart [servicename] $RESET" >> /etc/motd
+echo "" >>/etc/motd
+echo -e "$G Prometheus   $RESET is available under $B http://$domain:9090 $RESET" >>/etc/motd
+echo -e "$G AlertManager $RESET is available under $B http://$domain:9093 $RESET" >>/etc/motd
+echo -e "$G Grafana      $RESET is available under $B http://$domain:3000 $RESET" >>/etc/motd
+echo -e "Grafana default user:password $X admin:admin $RESET" >>/etc/motd
+echo -e "Config files are in $X {{prometheus_dir}}/config/ $RESET" >>/etc/motd
+echo -e "To restart services after config update make $G cd {{prometheus_dir}} $RESET and $G sudo docker-compose restart [servicename] $RESET" >>/etc/motd

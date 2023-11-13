@@ -17,7 +17,7 @@ services:
     networks:
       - prometheus
   alertmanager:
-    image: prom/alertmanager:${ALERTMANAGER_TAG}
+    image: prom/alertmanager:v0.24.0
     volumes:
       - ./config:/prometheus
       - ./data/alertmanager:/data
@@ -30,8 +30,9 @@ services:
     networks:
       - prometheus
 
+
   node-exporter:
-    image: prom/node-exporter:${NODE_EXPORTER_TAG}
+    image: prom/node-exporter:v1.3.1
     ports:
       - 9100:9100
     restart: always
@@ -39,7 +40,7 @@ services:
      - prometheus
 
   grafana:
-    image: grafana/grafana:${GRAFANA_TAG}
+    image: grafana/grafana:8.2.6
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana

@@ -1,20 +1,4 @@
 ---
-- name: Update and upgrade apt packages
-  become: true
-  apt:
-    upgrade: true
-    update_cache: true
-
-- name: Install packages
-  become: true
-  apt:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - docker.io
-    - docker-compose
-    - cloud-init
-
 - name: Create directory for app
   file:
     path: "{{prometheus_dir}}"

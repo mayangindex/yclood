@@ -1,11 +1,5 @@
 ---
-prometheus_dir: /opt/prometheus
-PROMETHEUS_TAG: v2.36.2
-ALERTMANAGER_TAG: v0.24.0
-NODE_EXPORTER_TAG: v1.3.1
-BLACKBOX_EXPORTER_TAG: v0.19.0
-GRAFANA_TAG: 8.2.6
-PUSHGATEWAY_TAG: v1.4.3
+app_dir: /opt/prometheus
 
 prometheus_alertmanager_resolve_timeout: 5m
 prometheus_alertmanager_smtp_from: ""

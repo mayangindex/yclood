@@ -4,10 +4,7 @@
   "labels": ["docker", "docker-compose"],
   "autodiscover": true,
   "docker": {
-    "enabled": true,
-    "fileRules": [
-      "docker-compose.yml.j2"
-    ]
+    "enabled": true
   },
   "ignorePaths": ["**/*.md", "**/*.json", "**/*.yml"],
   "prHourlyLimit": 5

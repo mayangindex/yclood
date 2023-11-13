@@ -1,9 +1,20 @@
 {
-   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-   "extends": ["config:recommended"],
-
-   "prHourlyLimit": 4,
-  "fileMatch": [
-    "(^|/)(?:docker-)?compose[^/]*\\.y?ml.j2$"
-  ]
+  "extends": ["config:base"],
+  "platform": "github",
+  "labels": ["docker", "docker-compose"],
+  "autodiscover": true,
+  "packageRules": [
+    {
+      "updateTypes": ["docker"],
+      "updateScope": "docker-compose.yml.j2"
+    }
+  ],
+  "docker": {
+    "enabled": true,
+    "fileRules": [
+      "docker-compose.yml.j2"
+    ]
+  },
+  "ignorePaths": ["**/*.md", "**/*.json", "**/*.yml"],
+  "prHourlyLimit": 5
 }

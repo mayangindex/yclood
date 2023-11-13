@@ -1,9 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-
   "prHourlyLimit": 4,
-
   "regexManagers": [
     {
       "description": "Update docker references in gitlab variables",

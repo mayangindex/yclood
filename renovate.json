@@ -10,6 +10,9 @@
       "schedule": ["on monday"]
     }
   ],
+  "fileMatch": [
+    "(^|/)(?:docker-)?compose[^/]*\\.y?ml.j2$"
+  ]
   "depTypes": ["*"],
   "separateMajorMinor": true
 }

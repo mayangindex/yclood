@@ -1,9 +1,9 @@
 [Unit]
-Description = prometheus start service.
+Description = elk start service.
 After       = syslog.target
 
 [Service]
-ExecStart   = {{ prometheus_dir }}/startup.sh
+ExecStart   = {{ app_dir }}/start.sh
 
 [Install]
 WantedBy=default.target

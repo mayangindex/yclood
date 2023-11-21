@@ -1,0 +1,7 @@
+---
+- name: Provision Image elk
+  hosts: default
+  become: true
+  roles:
+    - base
+    - elk

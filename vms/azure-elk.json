@@ -1,0 +1,42 @@
+{
+  "builders": [
+    {
+      "type": "azure-arm",
+
+      "client_id": "572a3958-9326-4925-9166-5dce1d4917cc",
+      "client_secret": "hEw8Q~SrZvLcFffethDO1R42jgt49OBCVHhNxb-r",
+      "tenant_id": "1c6ff089-37c5-4076-b097-945649575ddb",
+      "subscription_id": "c31519f0-761f-497b-8e30-0aa9e89992dc",
+
+      "managed_image_resource_group_name": "marketplace",
+      "managed_image_name": "elk-ubuntu-2204-lts-{{isotime | clean_resource_name}}",
+
+      "os_type": "Linux",
+      "image_publisher": "canonical",
+      "image_offer": "0001-com-ubuntu-server-jammy",
+      "image_sku": "22_04-lts",
+
+      "azure_tags": {
+        "dept": "Engineering",
+        "task": "Image deployment"
+      },
+
+      "location": "East US",
+      "vm_size": "Standard_DS2_v2"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "extra_arguments": [
+        "--scp-extra-args",
+        "'-O'",
+        "--ssh-extra-args",
+        "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa",
+        "--become"
+      ],
+
+      "playbook_file": "./playbook-elk.yml"
+    }
+  ]
+}

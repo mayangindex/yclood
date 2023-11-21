@@ -1,28 +1,41 @@
 ---
 - name: Create directory for app
   file:
-    path: "{{ app_dir }}"
+    path: "{{app_dir}}"
     state: directory
     mode: "0755"
 
 - name: Copy .env
   template:
     src: templates/.env.j2
-    dest: "{{ app_dir }}/.env"
+    dest: "{{app_dir}}/.env"
+    mode: "0755"
+
+- name: Copy credentials file
+  template:
+    src: templates/credentials.j2
+    dest: "{{app_dir}}/credentials"
     mode: "0755"
 
 - name: Copy docker compose file
   template:
     src: templates/docker-compose.yml.j2
-    dest: "{{ app_dir }}/docker-compose.yml"
+    dest: "{{app_dir}}/docker-compose.yml"
     group: www-data
     mode: "0440"
 
-- name: Create startup.sh
+- name: Copy logstash config file
+  template:
+    src: templates/logstash.conf
+    dest: "{{app_dir}}/logstash.conf"
+    group: www-data
+    mode: "0440"
+
+- name: Create start.sh
   become: true
   template:
     src: templates/start.sh.j2
-    dest: "{{ app_dir }}/startup.sh"
+    dest: "{{app_dir}}/start.sh"
     owner: root
     mode: "0755"
 
@@ -34,36 +47,92 @@
     owner: root
     mode: "0644"
 
+- name: Create startup.sh
+  become: true
+  template:
+    src: templates/startup.sh.j2
+    dest: "{{app_dir}}/startup.sh"
+    owner: root
+    mode: "0755"
+
+- name: Create systemd service
+  become: true
+  template:
+    src: templates/startup.service.j2
+    dest: /etc/systemd/system/startup.service
+    owner: root
+    mode: "0644"
+
 - name: Enable service
   systemd:
     name: elk
     enabled: yes
 
-- name: Pull Docker Compose images
+- name: Enable service
+  systemd:
+    name: startup
+    enabled: yes
+
+- name: Build & pull services
+  become: yes
   docker_compose:
-    project_src: "{{ app_dir }}"
-    pull: yes
+    project_src: "{{app_dir}}"
+    build: yes
+    state: present
+    stopped: yes
 
 - name: Create a network
   become: true
   docker_network:
-    name: elk
+    name: elastic
 
-- name: deploy Docker Compose stack
-  become: true
-  community.docker.docker_compose:
-    project_src: "{{ app_dir }}"
-    files:
-      - docker-compose.yml
+# - name: deploy Docker Compose stack
+#   become: true
+#   community.docker.docker_compose:
+#     project_src: "{{app_dir}}"
+#     files:
+#       - docker-compose.yml
 
 - name: Copy cleanup file
   template:
     src: templates/cleanup.sh
-    dest: "{{ app_dir }}/cleanup.sh"
+    dest: "{{app_dir}}/cleanup.sh"
     mode: "0755"
 
-- name: This command will change the working directory to somedir/
+- name: This command will change the working directory to {{app_dir}}
   become: true
   ansible.builtin.shell:
     cmd: ./cleanup.sh
-    chdir: "{{ app_dir }}"
+    chdir: "{{app_dir}}"
+
+- name: Copy cleanup file
+  template:
+    src: templates/yc-image-cleanup.sh
+    dest: "{{app_dir}}/yc-image-cleanup.sh"
+    mode: "0755"
+# - name: This command will change the working directory to {{app_dir}}
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: ./yc-image-cleanup.sh
+#     chdir: "{{app_dir}}"
+
+
+
+- name: Run multiline shell script
+  ansible.builtin.shell: |
+    #!/bin/bash
+    # Clean up
+    apt-get -y --purge remove linux-headers-$(uname -r) build-essential
+    apt-get -y --purge autoremove
+    apt-get -y purge $(dpkg --list |grep '^rc' |awk '{print $2}')
+    apt-get -y purge $(dpkg --list |egrep 'linux-image-[0-9]' |awk '{print $3,$2}' |sort -nr |tail -n +2 |grep -v $(uname -r) |awk '{ print $2}')
+    apt-get -y clean
+
+
+- name: Remove dependencies that are no longer required
+  ansible.builtin.apt:
+    autoremove: yes
+
+- name: Run the equivalent of "apt-get clean" as a separate step
+  apt:
+    clean: yes

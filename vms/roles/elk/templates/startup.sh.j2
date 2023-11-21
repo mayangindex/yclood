@@ -1,0 +1,14 @@
+#!/bin/bash -x
+STACK_PASSWORD=$(openssl rand -hex 10)
+cd {{app_dir}}
+
+sed -i "s/change_password/$STACK_PASSWORD/g" .env
+sed -i "s/change_password/$STACK_PASSWORD/g" credentials
+ENCRYPTION_KEY=$(openssl rand -hex 25)
+sed -i "s/change_key/$ENCRYPTION_KEY/g" .env
+
+IP=$(curl https://ifconfig.io/ip)
+sed -i "s/change_ip/$IP/g" credentials
+systemctl disable startup
+rm /etc/systemd/system/startup.service
+rm "$0"

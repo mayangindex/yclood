@@ -1,9 +1,9 @@
 [Unit]
-Description = elk start service.
+Description = startup service starting
 After       = syslog.target
 
 [Service]
-ExecStart   = {{app_dir}}/start.sh
+ExecStart   = {{app_dir}}/startup.sh
 
 [Install]
 WantedBy=default.target

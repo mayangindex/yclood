@@ -15,20 +15,15 @@
     - docker-compose
     - cloud-init
 
-- name: Create directory for app
-  file:
-    path: "{{app_dir}}"
-    state: directory
-    mode: 0755
 
-- name: Copy cleanup file
-  template:
-    src: templates/cleanup.sh
-    dest: "{{app_dir}}/cleanup.sh"
-    mode: 0755
+# - name: Copy cleanup file
+#   template:
+#     src: templates/cleanup.sh
+#     dest: "{{app_dir}}/cleanup.sh"
+#     mode: 0755
 
-- name: This command will change the working directory to somedir/
-  become: true
-  ansible.builtin.shell:
-    cmd: ./cleanup.sh
-    chdir: "{{app_dir}}"
+# - name: This command will change the working directory to somedir/
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: ./cleanup.sh
+#     chdir: "{{app_dir}}"

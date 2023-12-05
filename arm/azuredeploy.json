@@ -1,0 +1,485 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ubuntuOSVersion": {
+      "defaultValue": "22_04-lts-gen2",
+      "allowedValues": ["22_04-lts-gen2"],
+      "type": "String",
+      "metadata": {
+        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
+      }
+    },
+    "vmNameServer": {
+      "defaultValue": "k3s-server",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies a VM name."
+      }
+    },
+    "ProjectName": {
+      "defaultValue": "k3s",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies a VM name."
+      }
+    },
+    "vmNameAgent": {
+      "defaultValue": "k3s-agent",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies a VM name."
+      }
+    },
+    "publicIPName": {
+      "defaultValue": "loadblancerIP",
+      "type": "String",
+      "metadata": {
+        "description": "Name for the Public IP used to access the Web Front-End."
+      }
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the location for all of the resources created by this template."
+      }
+    },
+    "adminUsername": {
+      "defaultValue": "azureuser",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the virtual machine administrator username."
+      }
+    },
+    "authenticationType": {
+      "defaultValue": "sshPublicKey",
+      "allowedValues": ["sshPublicKey", "password"],
+      "type": "String",
+      "metadata": {
+        "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+      }
+    },
+    "adminPasswordOrKey": {
+      "type": "SecureString",
+      "metadata": {
+        "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+      }
+    },
+    "dnsNameforLBIP": {
+      "defaultValue": "[take(uniqueString(resourceGroup().id, variables('lbName')), 20)]",
+      "type": "String",
+      "metadata": {
+        "description": "DNS for Load Balancer IP"
+      }
+    },
+    "vmSize": {
+      "defaultValue": "Standard_D4s_v4",
+      "allowedValues": ["Standard_D4s_v4"],
+      "type": "String",
+      "metadata": {
+        "description": "This is the headnode Azure Virtual Machine size, and will affect the cost. If you don't know, just leave the default value."
+      }
+    },
+    "githubAccount": {
+      "defaultValue": "mayangindex",
+      "type": "String",
+      "metadata": {
+        "description": "Target GitHub account"
+      }
+    },
+    "githubBranch": {
+      "defaultValue": "main",
+      "type": "String",
+      "metadata": {
+        "description": "Target GitHub branch"
+      }
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/scripts/', parameters('githubBranch'), '/')]",
+    "lbName": "[concat(parameters('ProjectName'),'-lb')]",
+    "lbSkuName": "Standard",
+    "lbPublicIpAddressName": "[parameters('publicIPName')]",
+    "lbFrontEndName": "LoadBalancerFrontEnd",
+    "lbBackendPoolName": "LoadBalancerBackEndPool",
+    "lbProbeName": "loadBalancerHealthProbe",
+    "nsgName": "[concat(parameters('ProjectName'),'-nsg')]",
+    "vNetName": "[concat(parameters('ProjectName'),'-vnet')]",
+    "vNetAddressPrefix": "10.0.0.0/16",
+    "token": "[concat('token-', uniqueString(resourceGroup().id))]",
+    "numberOfVMsJumpstart": 1,
+    "numberOfVMsAgent": 0,
+    "vNetSubnetName": "BackendSubnet",
+    "vNetSubnetAddressPrefix": "10.0.1.0/24",
+    "vmStorageAccountType": "Standard_LRS",
+    "vmSize": "[parameters('vmSize')]",
+    "linuxConfiguration": {
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+            "keyData": "[parameters('adminPasswordOrKey')]"
+          }
+        ]
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('lbName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbPublicIpAddressName'))]"
+      ],
+      "sku": {
+        "name": "[variables('lbSkuName')]"
+      },
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('lbFrontEndName')]",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIpAddressName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('lbBackendPoolName')]"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "HTTPLBRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('lbName'), variables('lbFrontEndName'))]"
+              },
+              "backendAddressPool": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('lbBackendPoolName'))]"
+              },
+              "frontendPort": 443,
+              "backendPort": 443,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 4,
+              "protocol": "Tcp",
+              "enableTcpReset": false,
+              "loadDistribution": "Default",
+              "disableOutboundSnat": false,
+              "probe": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('lbName'), variables('lbProbeName'))]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('lbProbeName')]",
+            "properties": {
+              "protocol": "Http",
+              "port": 80,
+              "requestPath": "/healthz",
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('lbPublicIPAddressName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[variables('lbSkuName')]"
+      },
+      "properties": {
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static",
+
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsNameforLBIP')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('nsgName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "nsgRule1",
+            "properties": {
+              "description": "description",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRanges": ["22", "80", "443", "8080", "6443"],
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('vNetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["[variables('vNetAddressPrefix')]"]
+        },
+        "subnets": [
+          {
+            "name": "[variables('vNetSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('vNetSubnetAddressPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(parameters('vmNameServer'),'-vm', copyIndex(1))]",
+      "location": "[parameters('location')]",
+      "dependsOn": ["networkInterfaceCopy"],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "canonical",
+            "offer": "0001-com-ubuntu-server-jammy",
+            "sku": "[parameters('ubuntuOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('vmStorageAccountType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNameServer'),'-vm', copyIndex(1), '-networkInterface'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNameServer'),'-vm', copyIndex(1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPasswordOrKey')]",
+          "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+        }
+      },
+      "copy": {
+        "name": "vmCopy",
+        "count": "[variables('numberOfVMsJumpstart')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(parameters('vmNameAgent'),'-vm', copyIndex(1))]",
+      "location": "[parameters('location')]",
+      "dependsOn": ["networkInterfaceCopy"],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "canonical",
+            "offer": "0001-com-ubuntu-server-jammy",
+            "sku": "[parameters('ubuntuOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('vmStorageAccountType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNameAgent'),'-vm', copyIndex(1), '-networkInterface'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNameAgent'),'-vm', copyIndex(1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPasswordOrKey')]",
+          "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+        }
+      },
+      "copy": {
+        "name": "vmCopy",
+        "count": "[variables('numberOfVMsAgent')]"
+      }
+    },
+    // {
+    //     "type": "Microsoft.Network/publicIPAddresses",
+    //     "apiVersion": "2022-01-01",
+    //     "name": "[concat(parameters('vmNameAgent'),'-vm', copyIndex(1), '-publicIp')]",
+    //     "location": "[parameters('location')]",
+    //     "sku": {
+    //         "name": "Standard"
+    //     },
+    //     "properties": {
+    //         "publicIPAddressVersion": "IPv4",
+    //         "publicIPAllocationMethod": "Static"
+    //     },
+    //     "copy": {
+    //         "name": "publicIPAddressCopy",
+    //         "count": "[variables('numberOfVMsAgent')]"
+    //     }
+    // },
+    // {
+    //     "type": "Microsoft.Network/publicIPAddresses",
+    //     "apiVersion": "2022-01-01",
+    //     "name": "[concat(parameters('vmNameServer'),'-vm', copyIndex(1), '-publicIp')]",
+    //     "location": "[parameters('location')]",
+    //     "sku": {
+    //         "name": "Standard"
+    //     },
+    //     "properties": {
+    //         "publicIPAddressVersion": "IPv4",
+    //         "publicIPAllocationMethod": "Static"
+    //     },
+    //     "copy": {
+    //         "name": "publicIPAddressCopy",
+    //         "count": "[variables('numberOfVMsJumpstart')]"
+    //     }
+    // },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-01-01",
+      "name": "[concat(parameters('vmNameServer'),'-vm', copyIndex(1), '-networkInterface')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/', variables('vNetName'))]",
+        "[resourceId('Microsoft.Network/loadBalancers/', variables('lbName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
+        // ,
+        // "publicIPAddressCopy"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+              },
+              // "publicIpAddress": {
+              //     "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('vmNameServer'),'-vm', copyIndex(1), '-publicIp'))]"
+              // },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('lbBackendPoolName'))]"
+                }
+              ]
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+        }
+      },
+      "copy": {
+        "name": "networkInterfaceCopy",
+        "count": "[variables('numberOfVMsJumpstart')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-01-01",
+      "name": "[concat(parameters('vmNameAgent'),'-vm', copyIndex(1), '-networkInterface')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/', variables('vNetName'))]",
+        "[resourceId('Microsoft.Network/loadBalancers/', variables('lbName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
+        // ,
+        // "publicIPAddressCopy"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+              },
+              // "publicIpAddress": {
+              //     "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('vmNameAgent'),'-vm', copyIndex(1), '-publicIp'))]"
+              // },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('lbBackendPoolName'))]"
+                }
+              ]
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+        }
+      },
+      "copy": {
+        "name": "networkInterfaceCopy",
+        "count": "[variables('numberOfVMsAgent')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmNameServer'), '-vm', copyIndex(1), '/installscript_k3s')]",
+      "apiVersion": "2022-08-01",
+      "location": "[parameters('location')]",
+
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmNameServer'), '-vm', copyIndex(1)))]"
+      ],
+
+      "copy": {
+        "name": "extensionCopy",
+        "count": "[variables('numberOfVMsJumpstart')]"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.1",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "timestamp": 123456789
+        },
+        "protectedSettings": {
+          "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', variables('token'), ' ', parameters('location'), ' ',reference(resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIPAddressName'))).dnsSettings.fqdn,' ', variables('templateBaseUrl'))]",
+          "fileUris": ["[uri(variables('templateBaseUrl'), 'installK3s.sh')]"]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ubuntuOSVersion": {
+      "value": "22_04-lts-gen2"
+    },
+    "vmNameServer": {
+      "value": "k3s-server"
+    },
+    "ProjectName": {
+      "value": "k3s"
+    },
+    "vmNameAgent": {
+      "value": "k3s-agent"
+    },
+    "publicIPName": {
+      "value": "loadblancerIP"
+    },
+    "location": {
+      "value": "[resourceGroup().location]"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "authenticationType": {
+      "value": "sshPublicKey"
+    },
+    "adminPasswordOrKey": {
+      "value": null
+    },
+    "dnsNameforLBIP": {
+      "value": "[take(uniqueString(resourceGroup().id, variables('lbName')), 20)]"
+    },
+    "vmSize": {
+      "value": "Standard_D4s_v4"
+    },
+    "githubAccount": {
+      "value": "mayangindex"
+    },
+    "githubBranch": {
+      "value": "main"
+    }
+  }
+}

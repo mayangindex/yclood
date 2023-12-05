@@ -85,54 +85,9 @@
   become: true
   docker_network:
     name: elastic
-
 # - name: deploy Docker Compose stack
 #   become: true
 #   community.docker.docker_compose:
 #     project_src: "{{app_dir}}"
 #     files:
 #       - docker-compose.yml
-
-- name: Copy cleanup file
-  template:
-    src: templates/cleanup.sh
-    dest: "{{app_dir}}/cleanup.sh"
-    mode: "0755"
-
-- name: This command will change the working directory to {{app_dir}}
-  become: true
-  ansible.builtin.shell:
-    cmd: ./cleanup.sh
-    chdir: "{{app_dir}}"
-
-- name: Copy cleanup file
-  template:
-    src: templates/yc-image-cleanup.sh
-    dest: "{{app_dir}}/yc-image-cleanup.sh"
-    mode: "0755"
-# - name: This command will change the working directory to {{app_dir}}
-#   become: true
-#   ansible.builtin.shell:
-#     cmd: ./yc-image-cleanup.sh
-#     chdir: "{{app_dir}}"
-
-
-
-- name: Run multiline shell script
-  ansible.builtin.shell: |
-    #!/bin/bash
-    # Clean up
-    apt-get -y --purge remove linux-headers-$(uname -r) build-essential
-    apt-get -y --purge autoremove
-    apt-get -y purge $(dpkg --list |grep '^rc' |awk '{print $2}')
-    apt-get -y purge $(dpkg --list |egrep 'linux-image-[0-9]' |awk '{print $3,$2}' |sort -nr |tail -n +2 |grep -v $(uname -r) |awk '{ print $2}')
-    apt-get -y clean
-
-
-- name: Remove dependencies that are no longer required
-  ansible.builtin.apt:
-    autoremove: yes
-
-- name: Run the equivalent of "apt-get clean" as a separate step
-  apt:
-    clean: yes

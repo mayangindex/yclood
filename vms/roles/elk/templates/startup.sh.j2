@@ -11,4 +11,10 @@ IP=$(curl https://ifconfig.io/ip)
 sed -i "s/change_ip/$IP/g" credentials
 systemctl disable startup
 rm /etc/systemd/system/startup.service
+sed -i '/deploying, please wait a while/d' /etc/motd
+echo "" >>/etc/motd
+echo -e "$G Elk   $RESET is available under $B http://$domain:5601 $RESET" >>/etc/motd
+echo -e "Config files are in $X {{app_dir}}/ $RESET" >>/etc/motd
+echo -e "To restart services after config update make $G cd {{app_dir}} $RESET and $G sudo docker-compose restart [servicename] $RESET" >>/etc/motd
+cat credentials >>/etc/motd
 rm "$0"

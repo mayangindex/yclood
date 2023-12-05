@@ -14,8 +14,6 @@
     - docker.io
     - docker-compose
     - cloud-init
-
-
 # - name: Copy cleanup file
 #   template:
 #     src: templates/cleanup.sh

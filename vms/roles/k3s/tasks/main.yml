@@ -1,0 +1,160 @@
+---
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: true
+    update_cache: true
+
+- name: One way to avoid apt_key once it is removed from your distro
+  block:
+    - name: 2. Install dependency packages
+      apt: name={{ item }}
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+        - cloud-init
+        - uuid-runtime
+    - name: 3. Get APT Key
+      shell: |
+        curl https://baltocdn.com/helm/signing.asc |
+        gpg --dearmor |
+        sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+
+    - name: Task 1 - Generate UUID
+      command: uuidgen
+      register: rke2_token
+      changed_when: false
+
+    - name: 3.1 Get APT Key2
+      ansible.builtin.shell:
+        cmd: echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+    - name: 4. Update Packages
+      apt:
+        update_cache: true
+
+    - name: 5. Install helm
+      apt:
+        update_cache: true
+        name: helm
+
+- name: Install a list of packages
+  ansible.builtin.apt:
+    pkg:
+      - helm
+
+- name: Create directory for app
+  file:
+    path: "{{rke_dir}}"
+    state: directory
+    mode: "0755"
+
+- name: Download rke2-images-{{rke2_cni}}.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{rke_version}}/rke2-images-{{rke2_cni}}.linux-amd64.tar.zst
+    dest: "{{rke_dir}}"
+
+- name: Download sha256sum-amd64.txt
+  ansible.builtin.get_url:
+    url: "https://github.com/rancher/rke2/releases/download/\
+      {{rke_version}}/sha256sum-amd64.txt"
+    dest: "{{rke_dir}}"
+
+- name: Download rke2.linux-amd64.tar.gz
+  ansible.builtin.get_url:
+    url: "https://github.com/rancher/rke2/releases/download/\
+      {{rke_version}}/rke2.linux-amd64.tar.gz"
+    dest: "{{rke_dir}}"
+
+- name: Download rke2-images-core.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: "https://github.com/rancher/rke2/releases/download/\
+      {{rke_version}}/rke2-images-core.linux-amd64.tar.zst"
+    dest: "{{rke_dir}}"
+
+- name: Download rke2-images-core.linux-amd64.tar.zst
+  ansible.builtin.get_url:
+    url: https://get.rke2.io
+    dest: /tmp/install.sh
+
+- name: Run install.sh
+  ansible.builtin.shell: INSTALL_RKE2_ARTIFACT_PATH={{rke_dir}}/ INSTALL_RKE2_METHOD=tar  sh /tmp/install.sh
+  args:
+    executable: /bin/sh
+
+- name: Enable rke2
+  ansible.builtin.shell: systemctl enable rke2-server.service
+  args:
+    executable: /bin/sh
+
+- name: Enable kubectl
+  ansible.builtin.shell: echo 'PATH=$PATH:/usr/local/bin' >> /etc/profile && echo 'PATH=$PATH:{{rke_dir}}/rke2/bin' >> /etc/profile && source /etc/profile
+  args:
+    executable: /bin/bash
+
+# - name: export KUBECONFIG
+#   ansible.builtin.shell: |
+#     export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+
+# - name: Add rancher UI chart repo
+#   kubernetes.core.helm_repository:
+#     name: "{{rancher_version}}"
+#     repo_url: "{{rancher_repo_url}}"
+
+- name: Create startup.sh
+  template:
+    src: templates/startup.sh.j2
+    dest: /root/startup.sh
+    owner: root
+    mode: "0755"
+
+- name: Create systemd RKE2 service
+  template:
+    src: templates/startup.service.j2
+    dest: /etc/systemd/system/startup.service
+    owner: root
+    mode: "0644"
+
+- name: Enable RKE2 service
+  systemd:
+    name: startup
+    enabled: true
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "/etc/rancher/rke2/"
+    state: directory
+    mode: "0755"
+
+- name: Copy config file
+  template:
+    src: templates/config.yaml.j2
+    dest: "/etc/rancher/rke2/config.yaml"
+    mode: "0755"
+  vars:
+    rke2_token1: "{{ rke2_token.stdout }}"
+
+- name: Copy cleanup file
+  template:
+    src: templates/cleanup.sh
+    dest: "{{rke_dir}}/cleanup.sh"
+    mode: "0755"
+
+- name: Run cleanup
+  become: true
+  ansible.builtin.shell:
+    cmd: ./cleanup.sh
+    chdir: "{{rke_dir}}"
+
+- name: Copy yc cleanup file
+  template:
+    src: templates/cleanup.sh
+    dest: "{{rke_dir}}/yc-image-cleanup.sh"
+    mode: "0755"
+- name: Run yc cleanup
+  become: true
+  ansible.builtin.shell:
+    cmd: ./yc-image-cleanup.sh
+    chdir: "{{rke_dir}}"

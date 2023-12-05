@@ -1,0 +1,6 @@
+#!/bin/bash -x
+IP=$(curl https://ifconfig.io/ip)
+sed -i "s/change_ip/$IP/g" credentials
+systemctl disable startup
+rm /etc/systemd/system/startup.service
+rm "$0"

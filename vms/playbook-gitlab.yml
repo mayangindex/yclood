@@ -1,0 +1,6 @@
+---
+- name: Provision Image Gitlab
+  hosts: default
+  become: true
+  roles:
+    - gitlab

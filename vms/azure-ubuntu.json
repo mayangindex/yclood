@@ -9,7 +9,7 @@
       "subscription_id": "c31519f0-761f-497b-8e30-0aa9e89992dc",
 
       "managed_image_resource_group_name": "vms",
-      "managed_image_name": "elk-ubuntu-2204-lts-{{isotime | clean_resource_name}}",
+      "managed_image_name": "ubuntu-2204-lts-{{isotime | clean_resource_name}}",
 
       "os_type": "Linux",
       "image_publisher": "canonical",
@@ -23,20 +23,6 @@
 
       "location": "East US",
       "vm_size": "Standard_DS2_v2"
-    }
-  ],
-  "provisioners": [
-    {
-      "type": "ansible",
-      "extra_arguments": [
-        "--scp-extra-args",
-        "'-O'",
-        "--ssh-extra-args",
-        "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa",
-        "--become"
-      ],
-
-      "playbook_file": "./playbook-elk.yml"
     }
   ]
 }

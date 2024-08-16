@@ -11,7 +11,8 @@
     }
   ],
   "docker-compose": {
-    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml.j2$"]
+    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml.j2$"],
+      "automerge": true
   },
   "depTypes": ["*"],
   "separateMajorMinor": true

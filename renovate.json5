@@ -2,17 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [config:recommended", ":dependencyDashboard"],
   "baseBranch": "main",
-  "platform": "github",
+
   "packageRules": [
     {
       "packageNames": ["*"],
-      "automerge": true,
+
       "schedule": ["on monday"]
     }
   ],
   "docker-compose": {
-    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml.j2$"],
-      "automerge": true
+    "fileMatch": ["(^|/)[a-z]*\.(?:docker-)?compose[^/]*\.y?ml.j2$"]
   },
   "depTypes": ["*"],
   "separateMajorMinor": true

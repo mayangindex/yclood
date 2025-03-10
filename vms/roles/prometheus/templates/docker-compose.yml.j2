@@ -17,7 +17,7 @@ services:
     networks:
       - prometheus
   alertmanager:
-    image: prom/alertmanager:v0.28.0
+    image: prom/alertmanager:v0.28.1
     volumes:
       - ./config:/prometheus
       - ./data/alertmanager:/data

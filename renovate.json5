@@ -1,31 +1,35 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+
   extends: [
     'config:recommended',
     ':dependencyDashboard',
-    ':automergeAll',
+    ':automergeAll'
   ],
-  baseBranchPatterns: [
-    'main',
-  ],
+
+  baseBranchPatterns: ['main'],
+
   packageRules: [
     {
-      matchPackageNames: [
-        '*',
-      ],
-      schedule: [
-        'on monday',
-      ],
+      matchPackageNames: ['*'],
+      schedule: ['on monday'],
       automerge: true,
       automergeType: 'pr',
-      automergeStrategy: 'squash',
-    },
+      automergeStrategy: 'squash'
+    }
   ],
+
   'docker-compose': {
     managerFilePatterns: [
-      '/(^|/)[a-z]*.(?:docker-)?compose[^/]*.y?ml.j2$/',
-    ],
+      '/(^|/)[a-z]*.(?:docker-)?compose[^/]*.y?ml.j2$/'
+    ]
   },
+
   separateMajorMinor: true,
+
   automerge: true,
+  automergeType: 'pr',
+  automergeStrategy: 'squash',
+
+  platformAutomerge: true
 }
